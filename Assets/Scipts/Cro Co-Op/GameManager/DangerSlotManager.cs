@@ -1,0 +1,131 @@
+using NUnit.Framework;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class DangerSlotManager : MonoBehaviour
+{
+    public static DangerSlotManager instance;
+    private void Awake()
+    {
+        if (instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+    }
+
+    public GameObject dangerTopUI;
+    public GameObject dangerDownUI;
+
+    public List<Slot> dagerSlots;
+    //public Slot tiggerSlotOld;
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        GameManager.OnDagerSlot += TrigerDagerSlot;
+        //GameManager.OnDagerSlot += SetDagerSlot;
+        //GameManager.OnWonTrigerSlot += CleanOldTriger;
+        //GameManager.OnTrueChange += ShowDagerSlot;
+    }
+
+    private void OnDestroy()
+    {
+        GameManager.OnDagerSlot -= TrigerDagerSlot;
+        //GameManager.OnDagerSlot -= SetDagerSlot;
+        //GameManager.OnWonTrigerSlot -= CleanOldTriger;
+        //GameManager.OnTrueChange -= ShowDagerSlot;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public void TrigerDagerSlot(List<Slot> Slots)
+    {
+        if (dagerSlots != null || dagerSlots.Count > 0)
+        {
+            foreach (Slot slot in dagerSlots)
+            {
+                slot.ShowDanger(false);
+            }
+        }
+        
+        dagerSlots = Slots;
+
+        if (dagerSlots != null && dagerSlots.Count > 0)
+        {
+            dangerTopUI.SetActive(true);
+            dangerDownUI.SetActive(true);
+            foreach (Slot slot in dagerSlots)
+            {
+                slot.ShowDanger(true);
+            }
+
+        }
+        else
+        {
+            dangerTopUI.SetActive(false);
+            dangerDownUI.SetActive(false);
+        }
+
+    }
+
+    /*
+    public void SetDagerSlot(List<Slot> Slots)
+    {
+        if (dagerSlots != null)
+        {
+            foreach (Slot slot in dagerSlots)
+            {
+                slot.ShowDanger(false);
+            }
+        }
+
+        dagerSlots = Slots;
+    }
+
+    public void CleanOldTriger(Slot newTiggerSlot)
+    {
+        Debug.Log($" CleanOldTriger ");
+        if (tiggerSlotOld != null)
+        {
+            
+            Debug.Log($" ??????????? tiggerSlotOld == {tiggerSlotOld.name} ????????????");
+            //Debug.Log($" ??????????? dagerSlots == {dagerSlots.Count} ????????????");
+
+            //foreach (Slot slot in dagerSlots)
+            //{
+            //    slot.ShowDanger(false);
+            //}
+            //GameManager.instance.CheckSlotTrigerWon(tiggerSlotOld);
+            //ShowDagerSlot();
+        }
+
+        tiggerSlotOld = newTiggerSlot;
+
+    }
+
+
+    public void ShowDagerSlot()
+    {
+        if (dagerSlots != null && dagerSlots.Count > 0)
+        {
+            dangerTopUI.SetActive(true);
+            dangerDownUI.SetActive(true);
+            foreach (Slot slot in dagerSlots)
+            {
+                slot.ShowDanger(true);
+            }
+
+        }
+        else
+        {
+            dangerTopUI.SetActive(false);
+            dangerDownUI.SetActive(false);
+        }
+    }
+    */
+}
