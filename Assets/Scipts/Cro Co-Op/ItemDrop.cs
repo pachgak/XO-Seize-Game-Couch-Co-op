@@ -9,9 +9,11 @@ public class ItemDrop : MonoBehaviour
 
     public float attractingDuration = 0.3f;
 
+    private event System.Action ActionHit;
+
     private RectTransform rectTransform;
-    private PlayerBase targetToPlayer;
-    
+    private Vector3 targetTo;
+    public PlayerBase playerOwner;
 
     private Vector2 spreadTargetPosition;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -34,9 +36,11 @@ public class ItemDrop : MonoBehaviour
         
     }
 
-    public void SetOwner(Slot bySlot)
+    public void SetUp(Slot bySlot ,Vector3 to, System.Action hitAction)
     {
-        targetToPlayer = bySlot.owner;
+        playerOwner = bySlot.owner;
+        ActionHit += hitAction;
+        targetTo = to;
         ItemIconManager.instance.SpawnItemIcon(bySlot.owner.typeIs, 1, this.transform);
 
         //if (bySlot.owner.typeIs == GameManager.PlayerType.X)
@@ -50,16 +54,18 @@ public class ItemDrop : MonoBehaviour
     }
 
     private void Spread()
-    {
+    { 
+
         //this.gameObject.LeanMove(spreadTargetPosition , spreadDuration);
         LeanTween.move(rectTransform, spreadTargetPosition, spreadDuration).setEase(LeanTweenType.easeOutCubic);
     }
-
+    //targetToPlayer.pointText.transform.position
     private void MoveTO()
     {
-        LeanTween.move(gameObject, targetToPlayer.pointText.transform.position, attractingDuration).setEase(LeanTweenType.easeInCubic).setOnComplete(() => 
-        { 
-            PointManager.instance.AddPlayerPoint(targetToPlayer,1);
+        LeanTween.move(gameObject, targetTo, attractingDuration).setEase(LeanTweenType.easeInCubic).setOnComplete(() => 
+        {
+            //PointManager.instance.AddPlayerPoint(targetToPlayer,1);
+            ActionHit?.Invoke();
             Destroy(gameObject);
         });
     }

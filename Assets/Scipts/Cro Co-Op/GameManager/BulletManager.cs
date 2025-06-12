@@ -49,6 +49,5 @@ public class BulletManager : MonoBehaviour
     public void BulletHitTarget(Slot targetSlot)
     {
         OnBulletHit?.Invoke(targetSlot);
-        Debug.Log($"BulletHitTarget");
     }
 }

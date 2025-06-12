@@ -62,9 +62,14 @@ public class Slot : MonoBehaviour, IPointerClickHandler
         if(point > 0) RetrueToOwner();
         point = 0;
         countXO.text = $"{point}";
-        countXO.gameObject.SetActive(false);
+        //countXO.gameObject.SetActive(false);
         danger.SetActive(false);
         protect.SetActive(false);
+
+        for (int i = 0; i < imageXO.transform.childCount; i++)
+        {
+            Destroy(imageXO.transform.GetChild(i).gameObject);
+        }
     }
 
     public void RetrueToOwner()
@@ -74,7 +79,10 @@ public class Slot : MonoBehaviour, IPointerClickHandler
         {
             GameObject clone = Instantiate(itemDropPrefab, EffectManager.instance.effectGameParant);
             clone.GetComponent<RectTransform>().position = this.GetComponent<RectTransform>().position;
-            clone.GetComponent<ItemDrop>().SetOwner(this);
+            clone.GetComponent<ItemDrop>().SetUp(this, this.owner.pointText.transform.position,() => 
+                {
+                    PointManager.instance.AddPlayerPoint(clone.GetComponent<ItemDrop>().playerOwner, 1); 
+                });
         }
 
         for (int i = 0; i < imageXO.transform.childCount; i++)
@@ -82,6 +90,29 @@ public class Slot : MonoBehaviour, IPointerClickHandler
             Destroy(imageXO.transform.GetChild(i).gameObject);
         }
 
+    }
+
+    public void RetrueToScore()
+    {
+        //PointManager.instance.AddPlayerPoint(owner, point); 
+        for (int i = 0; i < point; i++)
+        {
+            GameObject clone = Instantiate(itemDropPrefab, EffectManager.instance.effectGameParant);
+            clone.GetComponent<RectTransform>().position = this.GetComponent<RectTransform>().position;
+            clone.GetComponent<ItemDrop>().SetUp(this, this.owner.WinText.transform.position, () =>
+            {
+            });
+        }
+
+        ResetSlot();
+    }
+
+    public void DestroySlot()
+    {
+        GameObject clone = Instantiate(exprotionPrefab, EffectManager.instance.effectGameParant);
+        clone.GetComponent<RectTransform>().position = this.GetComponent<RectTransform>().position;
+
+        ResetSlot();
     }
 
     public void SlotSetCheckItMe(Slot slot)
@@ -93,7 +124,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
             {
                 audioSource.PlayOneShot(setEmptySound);
                 SetOwner(slot);
-                GameManager.instance.ChangeTurn();
+                GameManager.instance.ChangeTurn(true);
             }
             else if (owner != GameManager.instance.playerBaseTrun)
             {
@@ -106,11 +137,6 @@ public class Slot : MonoBehaviour, IPointerClickHandler
 
             }
         }
-    }
-
-    private void ChangeTurn()
-    {
-        GameManager.instance.ChangeTurn();
     }
 
     private void SetOwner(Slot slot)

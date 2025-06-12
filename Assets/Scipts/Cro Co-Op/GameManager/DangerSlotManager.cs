@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class DangerSlotManager : MonoBehaviour
 {
@@ -17,21 +18,26 @@ public class DangerSlotManager : MonoBehaviour
 
     public GameObject dangerTopUI;
     public GameObject dangerDownUI;
-
+    public AudioClip warningSound;
+    private AudioSource audioSource;
     public List<Slot> dagerSlots;
     //public Slot tiggerSlotOld;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         GameManager.OnDagerSlot += TrigerDagerSlot;
+        GameManager.OnTrueChange += SoundDagerSlot;
         //GameManager.OnDagerSlot += SetDagerSlot;
         //GameManager.OnWonTrigerSlot += CleanOldTriger;
+        //GameManager.OnTrueChange += ShowDagerSlot;
         //GameManager.OnTrueChange += ShowDagerSlot;
     }
 
     private void OnDestroy()
     {
         GameManager.OnDagerSlot -= TrigerDagerSlot;
+        GameManager.OnTrueChange -= SoundDagerSlot;
         //GameManager.OnDagerSlot -= SetDagerSlot;
         //GameManager.OnWonTrigerSlot -= CleanOldTriger;
         //GameManager.OnTrueChange -= ShowDagerSlot;
@@ -71,6 +77,14 @@ public class DangerSlotManager : MonoBehaviour
             dangerDownUI.SetActive(false);
         }
 
+    }
+
+    public void SoundDagerSlot()
+    {
+        if (dagerSlots != null && dagerSlots.Count > 0)
+        {
+            audioSource.PlayOneShot(warningSound);
+        }
     }
 
     /*

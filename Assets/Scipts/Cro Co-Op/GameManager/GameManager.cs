@@ -17,7 +17,9 @@ public class GameManager : MonoBehaviour
     }
 
     public static event Action OnResetGame;
-    public static event Action OnEndGame;
+    public static event Action<PlayerBase> OnEndGame3Line;
+    public static event Action<PlayerBase> OnEndGame3LineAndEmptyPoint;
+    public static event Action<PlayerBase> OnEndGameEmptyPoint;
     public static event Action OnTrueChange;
     public static event Action<Slot> OnSetSlot;
     public static event Action<List<Slot>> OnDagerSlot;
@@ -40,7 +42,6 @@ public class GameManager : MonoBehaviour
     //trun
     public PlayerType playerTrun;
     public PlayerBase firstPlayer;
-    public GameStep gameStep;
     public PlayerBase playerBaseTrun;
     public PlayerBase playerBaseNext;
     public bool isReadyClick;
@@ -49,12 +50,7 @@ public class GameManager : MonoBehaviour
     //public Slot clickSlot;
 
     //win
-    public Slot slotTrigerWin;
-
-    public GameObject dangerTopUI;
-    public GameObject dangerDownUI;
-
-    public List<Slot> dagerSlots;
+    public Slot slotTrigerWin; 
 
     [System.Serializable]
     public class Row
@@ -67,11 +63,6 @@ public class GameManager : MonoBehaviour
         X, O
     }
 
-    public enum GameStep
-    {
-        ReSetGame, PlayTrun, CheckSlotWon, ChangTrun, SlotWonWarning, EndGame
-    }
-
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -81,7 +72,7 @@ public class GameManager : MonoBehaviour
         firstPlayer = playerX;
 
         playerTrun = firstPlayer.typeIs;
-        SetTurn(playerTrun);
+        SetTurn(playerTrun,false); 
 
         for (int i = 0; i < row.Length; i++)
         {
@@ -93,34 +84,6 @@ public class GameManager : MonoBehaviour
         }
 
         isReadyClick = true;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-
-    }
-
-    public void SetGameStep(GameStep step)
-    {
-        switch (step)
-        {
-            case GameStep.ReSetGame:
-                OnResetGame?.Invoke();
-                break;
-            case GameStep.PlayTrun:
-                break;
-            case GameStep.CheckSlotWon:
-                break;
-            case GameStep.ChangTrun:
-                OnTrueChange?.Invoke();
-                break;
-            case GameStep.SlotWonWarning:
-                break;
-            case GameStep.EndGame:
-                break;
-        }
     }
 
     public void ClickSlot(Slot slotClick)
@@ -252,27 +215,25 @@ public class GameManager : MonoBehaviour
 
     public void CheckWin(Slot slotCheck)
     {
+        Debug.Log($"CheckWin");
         if (slotTrigerWin == null)
         {
-            CheckSlotTrigerWon(slotCheck);
+            if(CheckSlotTrigerWon2(slotCheck)) slotTrigerWin = slotCheck;
         }
         else
         {
-            if (CheckSlotTrigerWon(slotTrigerWin))
+            if (!CheckSlotTrigerWon2(slotTrigerWin))
             {
-                //ChangeTurn();
-            }
-            else
-            {
+                OnDagerSlot?.Invoke(GetDangerSlots(slotTrigerWin));
                 slotTrigerWin = null;
-                OnWonTrigerSlot?.Invoke(slotTrigerWin);
 
-                CheckSlotTrigerWon(slotCheck);
+                if (CheckSlotTrigerWon2(slotCheck)) slotTrigerWin = slotCheck;
             }
+            else OnDagerSlot?.Invoke(GetDangerSlots(slotTrigerWin));
 
         }
     }
-
+    /*
     public bool CheckSlotTrigerWon(Slot slotCheck)
     {
 
@@ -452,7 +413,7 @@ public class GameManager : MonoBehaviour
             return false;
         }
     }
-
+    */
     public bool CheckSlotTrigerWon2(Slot slotCheck)
     {
         if (GetDangerSlots(slotCheck).Count > 0)
@@ -466,10 +427,6 @@ public class GameManager : MonoBehaviour
     {
 
         List<Slot> dangerSlot = new List<Slot>();
-        bool isRowWon = false;
-        bool isColWon = false;
-        bool isDLeftWon = false;
-        bool isDRightWon = false;
 
         //Check Rows
         //Check RowsPositive
@@ -495,7 +452,6 @@ public class GameManager : MonoBehaviour
         //Check RowsWon
         if (checkRowP.Count + checkRowN.Count + 1 >= wonSlotCount)
         {
-            isRowWon = true;
             Debug.Log($"{slotCheck.owner.typeIs} isRowWon");
 
             foreach (Slot slot in checkRowP)
@@ -532,7 +488,6 @@ public class GameManager : MonoBehaviour
         //Check RowsWon
         if (checkColP.Count + checkColN.Count + 1 >= wonSlotCount)
         {
-            isColWon = true;
             Debug.Log($"{slotCheck.owner.typeIs} isColWon");
 
             foreach (Slot slot in checkColP)
@@ -576,7 +531,6 @@ public class GameManager : MonoBehaviour
         //Check DLeft
         if (checkLeftP.Count + checkLeftN.Count + 1 >= wonSlotCount)
         {
-            isDLeftWon = true;
             Debug.Log($"{slotCheck.owner.typeIs} isDLeftWon");
 
             foreach (Slot slot in checkLeftP)
@@ -613,7 +567,6 @@ public class GameManager : MonoBehaviour
         //Check DRight
         if (checkRightP.Count + checkRightN.Count + 1 >= wonSlotCount)
         {
-            isDRightWon = true;
             Debug.Log($"{slotCheck.owner.typeIs} isDLeftWon");
 
             foreach (Slot slot in checkRightP)
@@ -637,23 +590,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void ChangeTurn()
+    public void ChangeTurn(bool checkWin)
     {
         switch (playerTrun)
         {
             case PlayerType.X:
-                SetTurn(PlayerType.O);
+                SetTurn(PlayerType.O, checkWin);
 
                 break;
             case PlayerType.O:
-                SetTurn(PlayerType.X);
+                SetTurn(PlayerType.X, checkWin);
                 break;
         }
 
         OnTrueChange?.Invoke();
     }
 
-    public void SetTurn(PlayerType setPlayerTrun)
+    public void SetTurn(PlayerType setPlayerTrun , bool checkWin)
     {
         switch (setPlayerTrun)
         {
@@ -680,41 +633,44 @@ public class GameManager : MonoBehaviour
         LeanTween.scale(playerBaseNext.GetComponent<RectTransform>(), new Vector3(0.8f, 0.8f, 0.8f), 0.3f);
         LeanTween.alphaCanvas(playerBaseNext.GetComponent<CanvasGroup>(), 0.6f, 0.3f);
 
-        Debug.Log("================== SetTrun =======================");
+        if(checkWin) checkWiner();
 
+    }
+
+    public void checkWiner()
+    {
         if (slotTrigerWin == null)
         {
             if (!CheckPointCanPlayer())
             {
-                Debug.Log("================== GameOver =======================");
+               
+                OnEndGameEmptyPoint?.Invoke(GameManager.instance.playerBaseNext);
             }
             else
             {
-                Debug.Log("isReadyClick = True");
                 isReadyClick = true;
             }
         }
         else
         {
-            CheckSlotTrigerWon(slotTrigerWin);
+            OnDagerSlot?.Invoke(GetDangerSlots(slotTrigerWin));
             if (slotTrigerWin.owner == playerBaseTrun)
             {
-                Debug.Log("================== GameOver =======================");
+                
+                OnEndGame3Line?.Invoke(GameManager.instance.playerBaseTrun);
             }
             else
             {
                 if (!CheckPointCanPlayer())
                 {
-                    Debug.Log("================== GameOver =======================");
+                    OnEndGame3LineAndEmptyPoint?.Invoke(GameManager.instance.playerBaseTrun);
                 }
                 else
                 {
-                    Debug.Log("isReadyClick = True");
                     isReadyClick = true;
                 }
             }
         }
-
     }
 
     private bool CheckPointCanPlayer()
@@ -739,14 +695,8 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    public void GiveUp()
+    public void ShowDagerSlot(List<Slot> slot)
     {
-        switch (playerTrun)
-        {
-            case PlayerType.X:
-                break;
-            case PlayerType.O:
-                break;
-        }
+        OnDagerSlot?.Invoke(slot);
     }
 }

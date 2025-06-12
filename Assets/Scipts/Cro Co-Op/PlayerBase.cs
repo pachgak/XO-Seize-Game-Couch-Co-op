@@ -47,12 +47,14 @@ public class PlayerBase : MonoBehaviour
 
     private void ShowWin(int score)
     {
+        GameObject clone = Instantiate(ScoreManager.instance.effectWinChangePrefab, EffectManager.instance.effectTopGameUIParant);
+        clone.GetComponent<RectTransform>().position = pointText.GetComponent<RectTransform>().position;
+
         WinText.text = $"{score}";
     }
 
     private void ShowPoint(int point)
     {
         pointText.text = $"{point}";
-        Debug.Log("============== ShowPoint");
     }
 }

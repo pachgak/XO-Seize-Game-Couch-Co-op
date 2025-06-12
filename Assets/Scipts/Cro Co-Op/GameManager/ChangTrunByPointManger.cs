@@ -39,7 +39,7 @@ public class ChangTrunByPointManger : MonoBehaviour
 
         if (addPointRetrun == 0)
         {
-            GameManager.instance.ChangeTurn();
+            GameManager.instance.ChangeTurn(true);
         }
         else
         {
@@ -53,7 +53,7 @@ public class ChangTrunByPointManger : MonoBehaviour
         if (!isChecker) return;
         if (pointRetrun == pointCheck)
         {
-            GameManager.instance.ChangeTurn();
+            GameManager.instance.ChangeTurn(true);
             isChecker = false;
         }
     }
