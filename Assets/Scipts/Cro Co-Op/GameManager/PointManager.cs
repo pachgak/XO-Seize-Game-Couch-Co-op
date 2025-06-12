@@ -20,10 +20,10 @@ public class PointManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Invoke(nameof(OnAftertStart), 0.1f);
+        GameManager.OnResetBoard += ReSetPoinBase;
     }
 
-    private void OnAftertStart()
+    public void ReSetPoinBase()
     {
         SetPlayerPoint(GameManager.instance.playerX, GameManager.instance.pointBase);
         SetPlayerPoint(GameManager.instance.playerO, GameManager.instance.pointBase);

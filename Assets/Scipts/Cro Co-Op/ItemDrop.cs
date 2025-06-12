@@ -66,6 +66,7 @@ public class ItemDrop : MonoBehaviour
         {
             //PointManager.instance.AddPlayerPoint(targetToPlayer,1);
             ActionHit?.Invoke();
+            ItemDropManager.instance.checkPoint();
             Destroy(gameObject);
         });
     }

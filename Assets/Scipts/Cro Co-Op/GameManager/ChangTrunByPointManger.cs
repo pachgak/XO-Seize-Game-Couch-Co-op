@@ -18,14 +18,14 @@ public class ChangTrunByPointManger : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        PointManager.OnPointXChange += checkPoint;
-        PointManager.OnPointOChange += checkPoint;
+        //PointManager.OnPointXChange += checkPoint;
+        //PointManager.OnPointOChange += checkPoint;
     }
 
     private void OnDestroy()
     {
-                PointManager.OnPointXChange -= checkPoint;
-        PointManager.OnPointOChange -= checkPoint;
+        //PointManager.OnPointXChange -= checkPoint;
+        //PointManager.OnPointOChange -= checkPoint;
     }
 
     // Update is called once per frame

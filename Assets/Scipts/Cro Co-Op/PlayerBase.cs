@@ -8,6 +8,7 @@ public class PlayerBase : MonoBehaviour
     public GameObject giveUpUI;
     public TMP_Text pointText;
     public TMP_Text WinText;
+    public GameObject playerFirstIcon;
     [Header("System")]
     public GameManager.PlayerType typeIs;
 
@@ -24,6 +25,7 @@ public class PlayerBase : MonoBehaviour
             ScoreManager.OnScoreOChange += ShowWin;
             PointManager.OnPointOChange += ShowPoint;
         }
+        GameManager.OnChangPlayerFrist += ShowFirstIcon;
     }
     private void OnDestroy()
     {
@@ -37,6 +39,7 @@ public class PlayerBase : MonoBehaviour
             ScoreManager.OnScoreOChange -= ShowWin;
             PointManager.OnPointOChange -= ShowPoint;
         }
+        GameManager.OnChangPlayerFrist -= ShowFirstIcon;
     }
 
     // Update is called once per frame
@@ -48,7 +51,7 @@ public class PlayerBase : MonoBehaviour
     private void ShowWin(int score)
     {
         GameObject clone = Instantiate(ScoreManager.instance.effectWinChangePrefab, EffectManager.instance.effectTopGameUIParant);
-        clone.GetComponent<RectTransform>().position = pointText.GetComponent<RectTransform>().position;
+        clone.GetComponent<RectTransform>().position = WinText.GetComponent<RectTransform>().position;
 
         WinText.text = $"{score}";
     }
@@ -56,5 +59,11 @@ public class PlayerBase : MonoBehaviour
     private void ShowPoint(int point)
     {
         pointText.text = $"{point}";
+    }
+
+    private void ShowFirstIcon(PlayerBase player)
+    {
+        if(player == this) playerFirstIcon.SetActive(true);
+        else playerFirstIcon.SetActive(false);
     }
 }

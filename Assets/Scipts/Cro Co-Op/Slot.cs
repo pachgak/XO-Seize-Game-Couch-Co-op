@@ -37,6 +37,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
         //Add Event
         BulletManager.OnBulletHit += SlotSetCheckItMe;
         GameManager.OnTrueChange += ProtectCountDownTrun;
+        GameManager.OnResetBoard += DestroySlot;
     }
 
     private void OnDestroy()
@@ -59,7 +60,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
     public void ResetSlot()
     {
         owner = null;
-        if(point > 0) RetrueToOwner();
+        //if(point > 0) RetrueToOwner();
         point = 0;
         countXO.text = $"{point}";
         //countXO.gameObject.SetActive(false);
@@ -97,7 +98,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
         //PointManager.instance.AddPlayerPoint(owner, point); 
         for (int i = 0; i < point; i++)
         {
-            GameObject clone = Instantiate(itemDropPrefab, EffectManager.instance.effectGameParant);
+            GameObject clone = Instantiate(itemDropPrefab, EffectManager.instance.effectTopGameUIParant);
             clone.GetComponent<RectTransform>().position = this.GetComponent<RectTransform>().position;
             clone.GetComponent<ItemDrop>().SetUp(this, this.owner.WinText.transform.position, () =>
             {
@@ -109,6 +110,8 @@ public class Slot : MonoBehaviour, IPointerClickHandler
 
     public void DestroySlot()
     {
+        if (owner == null) return;
+
         GameObject clone = Instantiate(exprotionPrefab, EffectManager.instance.effectGameParant);
         clone.GetComponent<RectTransform>().position = this.GetComponent<RectTransform>().position;
 
@@ -128,9 +131,12 @@ public class Slot : MonoBehaviour, IPointerClickHandler
             }
             else if (owner != GameManager.instance.playerBaseTrun)
             {
-                audioSource.PlayOneShot(explosionSound);
+                audioSource.PlayOneShot(setEmptySound);
+                //audioSource.PlayOneShot(explosionSound);
                 SetNewOwner(slot);
-                ChangTrunByPointManger.instance.TrigerChangTrunByPoint(point-1); 
+                Debug.Log("-------------- explosionSound");
+                ItemDropManager.instance.TrigerCountDownItemDrop(point - 1, () => { GameManager.instance.ChangeTurn(true); });
+                //ChangTrunByPointManger.instance.TrigerChangTrunByPoint(point-1); 
             }
             else
             {

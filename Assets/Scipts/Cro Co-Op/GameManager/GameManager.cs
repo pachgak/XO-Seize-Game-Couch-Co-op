@@ -16,11 +16,13 @@ public class GameManager : MonoBehaviour
         instance = this;
     }
 
-    public static event Action OnResetGame;
+    public static event Action OnResetBoard;
+    public static event Action OnResetScore;
+    public static event Action OnTrueChange;
+    public static event Action<PlayerBase> OnChangPlayerFrist;
     public static event Action<PlayerBase> OnEndGame3Line;
     public static event Action<PlayerBase> OnEndGame3LineAndEmptyPoint;
     public static event Action<PlayerBase> OnEndGameEmptyPoint;
-    public static event Action OnTrueChange;
     public static event Action<Slot> OnSetSlot;
     public static event Action<List<Slot>> OnDagerSlot;
     public static event Action<List<Slot>> OnResetDagerSlot;
@@ -66,13 +68,22 @@ public class GameManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Invoke(nameof(OnAftertStart), 0.1f);
+    }
+
+    private void OnAftertStart()
+    {
         playerX.typeIs = PlayerType.X;
         playerO.typeIs = PlayerType.O;
 
-        firstPlayer = playerX;
+        //firstPlayer = playerX;
 
-        playerTrun = firstPlayer.typeIs;
-        SetTurn(playerTrun,false); 
+        //playerTrun = firstPlayer.typeIs;
+        //SetTurn(playerTrun,false);
+
+
+        SetPlayerFrist(playerX);
+        ResetScore();
 
         for (int i = 0; i < row.Length; i++)
         {
@@ -82,8 +93,6 @@ public class GameManager : MonoBehaviour
                 row[i].col[j].colSlot = j;
             }
         }
-
-        isReadyClick = true;
     }
 
     public void ClickSlot(Slot slotClick)
@@ -592,6 +601,8 @@ public class GameManager : MonoBehaviour
 
     public void ChangeTurn(bool checkWin)
     {
+        Debug.Log("------ ChangeTurn");
+
         switch (playerTrun)
         {
             case PlayerType.X:
@@ -699,4 +710,43 @@ public class GameManager : MonoBehaviour
     {
         OnDagerSlot?.Invoke(slot);
     }
+    public void ResetBoard()
+    {
+        ShowDagerSlot(null);
+        SetTurn(firstPlayer.typeIs,false);
+        OnResetBoard?.Invoke();
+
+        slotTrigerWin = null;
+    }
+    public void ChangPlayerFrist()
+    {
+        switch (firstPlayer.typeIs)
+        {
+            case PlayerType.X:
+                firstPlayer = playerO;
+
+                break;
+            case PlayerType.O:
+                firstPlayer = playerX;
+                break;
+        }
+
+        SetPlayerFrist(firstPlayer);
+    }
+
+    public void SetPlayerFrist(PlayerBase player)
+    {
+        isReadyClick = true;
+        firstPlayer = player;
+        OnChangPlayerFrist?.Invoke(firstPlayer);
+        ResetBoard();
+        SetTurn(firstPlayer.typeIs,false);
+    }
+    public void ResetScore()
+    {
+        OnResetScore?.Invoke();
+        ResetBoard();
+    }
+
+
 }

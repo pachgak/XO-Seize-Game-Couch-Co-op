@@ -51,11 +51,15 @@ public class DangerSlotManager : MonoBehaviour
 
     public void TrigerDagerSlot(List<Slot> Slots)
     {
-        if (dagerSlots != null || dagerSlots.Count > 0)
+        if (dagerSlots != null)
         {
-            foreach (Slot slot in dagerSlots)
+            if (dagerSlots.Count > 0)
             {
-                slot.ShowDanger(false);
+                foreach (Slot slot in dagerSlots)
+                {
+                    slot.ShowDanger(false);
+                }
+
             }
         }
         

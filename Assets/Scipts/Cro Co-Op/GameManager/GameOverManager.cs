@@ -1,5 +1,7 @@
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
 
 public class GameOverManager : MonoBehaviour
@@ -27,28 +29,110 @@ public class GameOverManager : MonoBehaviour
         SetWiner(winer);
 
         Debug.Log($"================== GameOver : Player {GameManager.instance.playerBaseNext.typeIs} Win by {GameManager.instance.playerBaseTrun.typeIs} No point  =======================");
+
+        StartCoroutine(AniWinByEmptyPoint());
+
+    }
+
+    IEnumerator AniWinByEmptyPoint()
+    {
         GameManager.instance.ShowDagerSlot(winerSlot);
+
+        yield return new WaitForSeconds(1f);
 
         foreach (Slot slot in losserSlot)
         {
             slot.DestroySlot();
         }
+
+        yield return new WaitForSeconds(1f);
+
+        int pointRe = 0;
         foreach (Slot slot in winerSlot)
         {
+            pointRe += slot.point;
             slot.RetrueToScore();
         }
+        Debug.Log($"pointRe : {pointRe}");
+        ItemDropManager.instance.TrigerCountDownItemDrop(pointRe, () =>
+        {
+            ScoreManager.instance.AddScorePlayer(pleyerWiner);
+            GameManager.instance.ChangPlayerFrist();
+        });
+        //PointManager.instance.ReSetPoinBase();
     }
+
     public void WinBy3Line(PlayerBase winer)
     {
         SetWiner(winer);
 
         Debug.Log($"================== GameOver : Player {GameManager.instance.playerBaseTrun.typeIs} Win by 3 Slot Line =======================");
+        StartCoroutine(AniWinBy3Line());
     }
+
+    IEnumerator AniWinBy3Line()
+    {
+        //GameManager.instance.ShowDagerSlot(winerSlot);
+
+        yield return new WaitForSeconds(1f);
+
+        foreach (Slot slot in losserSlot)
+        {
+            slot.DestroySlot();
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        int pointRe = 0;
+        foreach (Slot slot in winerSlot)
+        {
+            pointRe += slot.point;
+            slot.RetrueToScore();
+        }
+        Debug.Log($"pointRe : {pointRe}");
+        ItemDropManager.instance.TrigerCountDownItemDrop(pointRe, () => 
+        { 
+            ScoreManager.instance.AddScorePlayer(pleyerWiner);
+            GameManager.instance.ChangPlayerFrist();
+        });
+        //PointManager.instance.ReSetPoinBase();
+    }
+
     public void WinBy3LineAndEmptyPoint(PlayerBase winer)
     {
         SetWiner(winer);
 
         Debug.Log($"================== GameOver : Player {GameManager.instance.playerBaseTrun.typeIs} Win by {GameManager.instance.playerBaseNext.typeIs} No point and skip Trun =======================");
+
+        StartCoroutine(AniWinBy3LineAndEmptyPointt());
+    }
+
+    IEnumerator AniWinBy3LineAndEmptyPointt()
+    {
+        GameManager.instance.ShowDagerSlot(winerSlot);
+
+        yield return new WaitForSeconds(1f);
+
+        foreach (Slot slot in losserSlot)
+        {
+            slot.DestroySlot();
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        int pointRe = 0;
+        foreach (Slot slot in winerSlot)
+        {
+            pointRe += slot.point;
+            slot.RetrueToScore();
+        }
+        Debug.Log($"pointRe : {pointRe}");
+        ItemDropManager.instance.TrigerCountDownItemDrop(pointRe, () =>
+        {
+            ScoreManager.instance.AddScorePlayer(pleyerWiner);
+            GameManager.instance.ChangPlayerFrist();
+        });
+        //PointManager.instance.ReSetPoinBase();
     }
 
     private void SetWiner(PlayerBase winer)

@@ -22,12 +22,7 @@ public class ScoreManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        Invoke(nameof(OnAftertStart),0.1f);
-    }
-
-    private void OnAftertStart()
-    {
-        ResetScore();
+        GameManager.OnResetScore += ResetScore;
     }
 
     public void AddScorePlayer(PlayerBase player)
