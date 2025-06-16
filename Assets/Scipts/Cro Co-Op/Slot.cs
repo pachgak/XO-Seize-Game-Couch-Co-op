@@ -62,7 +62,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
         owner = null;
         //if(point > 0) RetrueToOwner();
         point = 0;
-        countXO.text = $"{point}";
+        showPointCheck();
         //countXO.gameObject.SetActive(false);
         danger.SetActive(false);
         protect.SetActive(false);
@@ -71,6 +71,18 @@ public class Slot : MonoBehaviour, IPointerClickHandler
         {
             Destroy(imageXO.transform.GetChild(i).gameObject);
         }
+    }
+
+
+    public void showPointCheck()
+    {
+        countXO.text = $"{point}";
+
+        if (point >= 10)
+        {
+            countXO.gameObject.SetActive(true);
+        }
+        else countXO.gameObject.SetActive(false);
     }
 
     public void RetrueToOwner()
@@ -149,7 +161,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
     {
         owner = GameManager.instance.playerBaseTrun;
         point++;
-        countXO.text = $"{point}";
+        showPointCheck();
         //PointManager.instance.RemovePlayerPoint(owner, point);
         ItemIconManager.instance.SpawnItemIcon(owner.typeIs, point, imageXO.transform);
         AddProtect(2);
@@ -195,6 +207,18 @@ public class Slot : MonoBehaviour, IPointerClickHandler
 
     public void ShowDanger(bool set)
     {
-        danger.SetActive(set);
+        //danger.SetActive(set);
+        //danger.GetComponent<CanvasGroup>().alpha = 1;
+        LeanTween.cancel(danger);
+
+        if (set)
+        {
+            danger.SetActive(true);
+            LeanTween.alphaCanvas(danger.GetComponent<CanvasGroup>(), 1, 0.5f);
+        }
+        else
+        {
+            LeanTween.alphaCanvas(danger.GetComponent<CanvasGroup>(), 0, 0.5f).setOnComplete(() => { danger.SetActive(false); });
+        }
     }
 }

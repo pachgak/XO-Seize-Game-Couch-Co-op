@@ -21,10 +21,20 @@ public class DangerSlotManager : MonoBehaviour
     public AudioClip warningSound;
     private AudioSource audioSource;
     public List<Slot> dagerSlots;
+
+    public Vector3 openTopDagerPos;
+    public Vector3 closeTopDagerPos;
+    public Vector3 openDownDagerPos;
+    public Vector3 closeDownDagerPos;
     //public Slot tiggerSlotOld;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if (openTopDagerPos == Vector3.zero) openTopDagerPos = dangerTopUI.GetComponent<RectTransform>().position;
+        if (openDownDagerPos == Vector3.zero) openDownDagerPos = dangerDownUI.GetComponent<RectTransform>().position;
+        dangerTopUI.GetComponent<RectTransform>().position = closeTopDagerPos;
+        dangerDownUI.GetComponent<RectTransform>().position = closeDownDagerPos;
+
         audioSource = GetComponent<AudioSource>();
         GameManager.OnDagerSlot += TrigerDagerSlot;
         GameManager.OnTrueChange += SoundDagerSlot;
@@ -46,7 +56,7 @@ public class DangerSlotManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void TrigerDagerSlot(List<Slot> Slots)
@@ -62,13 +72,13 @@ public class DangerSlotManager : MonoBehaviour
 
             }
         }
-        
+
         dagerSlots = Slots;
 
         if (dagerSlots != null && dagerSlots.Count > 0)
         {
-            dangerTopUI.SetActive(true);
-            dangerDownUI.SetActive(true);
+            OpenDangerUI();
+
             foreach (Slot slot in dagerSlots)
             {
                 slot.ShowDanger(true);
@@ -77,18 +87,40 @@ public class DangerSlotManager : MonoBehaviour
         }
         else
         {
-            dangerTopUI.SetActive(false);
-            dangerDownUI.SetActive(false);
+            CloseDangerUI();
         }
 
     }
 
     public void SoundDagerSlot()
     {
-        if (dagerSlots != null && dagerSlots.Count > 0)
+        if (dagerSlots != null && dagerSlots.Count > 0 && !GameManager.instance.isGameEnd)
         {
             audioSource.PlayOneShot(warningSound);
         }
+    }
+
+    private void OpenDangerUI()
+    {
+        LeanTween.cancel(dangerTopUI);
+        LeanTween.cancel(dangerDownUI);
+
+        LeanTween.move(dangerTopUI.gameObject, openTopDagerPos, 1f).setEase(LeanTweenType.easeOutQuint);
+        LeanTween.move(dangerDownUI.gameObject, openDownDagerPos, 1f).setEase(LeanTweenType.easeOutQuint);
+        
+        //dangerTopUI.SetActive(true);
+        //dangerDownUI.SetActive(true);
+    }
+    private void CloseDangerUI()
+    {
+        LeanTween.cancel(dangerTopUI);
+        LeanTween.cancel(dangerDownUI);
+
+        LeanTween.move(dangerTopUI.gameObject, closeTopDagerPos, 1f).setEase(LeanTweenType.easeInCubic);
+        LeanTween.move(dangerDownUI.gameObject, closeDownDagerPos, 1f).setEase(LeanTweenType.easeInCubic);
+
+        //dangerTopUI.SetActive(false);
+        //dangerDownUI.SetActive(false);
     }
 
     /*

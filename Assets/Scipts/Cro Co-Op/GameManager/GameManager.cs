@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviour
     public PlayerBase playerBaseTrun;
     public PlayerBase playerBaseNext;
     public bool isReadyClick;
+    public bool isGameEnd;
     //click
     //public bool haveClick = false;
     //public Slot clickSlot;
@@ -654,7 +655,7 @@ public class GameManager : MonoBehaviour
         {
             if (!CheckPointCanPlayer())
             {
-               
+                isGameEnd = true;
                 OnEndGameEmptyPoint?.Invoke(GameManager.instance.playerBaseNext);
             }
             else
@@ -664,20 +665,23 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            OnDagerSlot?.Invoke(GetDangerSlots(slotTrigerWin));
+            
             if (slotTrigerWin.owner == playerBaseTrun)
             {
-                
+                OnDagerSlot?.Invoke(GetDangerSlots(slotTrigerWin));
+                isGameEnd = true;
                 OnEndGame3Line?.Invoke(GameManager.instance.playerBaseTrun);
             }
             else
             {
                 if (!CheckPointCanPlayer())
                 {
-                    OnEndGame3LineAndEmptyPoint?.Invoke(GameManager.instance.playerBaseTrun);
+                    isGameEnd = true;
+                    OnEndGame3LineAndEmptyPoint?.Invoke(GameManager.instance.playerBaseNext);
                 }
                 else
                 {
+                    OnDagerSlot?.Invoke(GetDangerSlots(slotTrigerWin));
                     isReadyClick = true;
                 }
             }

@@ -54,16 +54,35 @@ public class PlayerBase : MonoBehaviour
         clone.GetComponent<RectTransform>().position = WinText.GetComponent<RectTransform>().position;
 
         WinText.text = $"{score}";
+        PopAniNumber(WinText.gameObject);
     }
 
     private void ShowPoint(int point)
     {
         pointText.text = $"{point}";
+        PopAniNumber(pointText.gameObject);
     }
 
     private void ShowFirstIcon(PlayerBase player)
     {
-        if(player == this) playerFirstIcon.SetActive(true);
-        else playerFirstIcon.SetActive(false);
+        LeanTween.cancel(playerFirstIcon.gameObject);
+        if (player == this)
+        {    
+            playerFirstIcon.SetActive(true);
+            LeanTween.scale(playerFirstIcon.gameObject, Vector3.one, 1.5f).setEase(LeanTweenType.easeOutElastic);
+        }
+        else LeanTween.scale(playerFirstIcon.gameObject, Vector3.zero, 0.5f).setOnComplete(() => { playerFirstIcon.SetActive(false); }); ;
+        }
+
+    private void PopAniShowIcon(GameObject icon)
+    {
+        icon.GetComponent<RectTransform>().localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        LeanTween.scale(icon.gameObject, new Vector3(1, 1, 1), 1f).setEase(LeanTweenType.easeOutElastic);
+    }
+
+    private void PopAniNumber(GameObject numberText)
+    {
+        numberText.GetComponent<RectTransform>().localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        LeanTween.scale(numberText.gameObject, new Vector3(1, 1, 1), 1f).setEase(LeanTweenType.easeOutElastic);
     }
 }
