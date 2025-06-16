@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour
 
 
         SetPlayerFrist(playerX);
-        ResetScore();
+        //ResetScore();
 
         for (int i = 0; i < row.Length; i++)
         {
