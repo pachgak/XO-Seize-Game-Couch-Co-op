@@ -16,7 +16,7 @@ public class BulletManager : MonoBehaviour
     }
 
     public static event Action<Slot> OnBulletHit;
-    public static event Action OnTest;
+    //public static event Action OnTest;
 
     public GameObject bulletPrefab;
     public Transform bulletParant;

@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerBase : MonoBehaviour
 {
@@ -11,21 +12,12 @@ public class PlayerBase : MonoBehaviour
     public GameObject playerFirstIcon;
     [Header("System")]
     public GameManager.PlayerType typeIs;
+    public Image playerIcon;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        if (this == GameManager.instance.playerX)
-        {
-            ScoreManager.OnScoreXChange += ShowWin;
-            PointManager.OnPointXChange += ShowPoint;
-        }
-        if (this == GameManager.instance.playerO)
-        {
-            ScoreManager.OnScoreOChange += ShowWin;
-            PointManager.OnPointOChange += ShowPoint;
-        }
-        GameManager.OnChangPlayerFrist += ShowFirstIcon;
+        //SetEvent();
     }
     private void OnDestroy()
     {
@@ -46,6 +38,22 @@ public class PlayerBase : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void SetEvent()
+    {
+        if (this == GameManager.instance.playerX)
+        {
+            ScoreManager.OnScoreXChange += ShowWin;
+            PointManager.OnPointXChange += ShowPoint;
+        }
+        if (this == GameManager.instance.playerO)
+        {
+            ScoreManager.OnScoreOChange += ShowWin;
+            PointManager.OnPointOChange += ShowPoint;
+        }
+        GameManager.OnChangPlayerFrist += ShowFirstIcon;
+
     }
 
     private void ShowWin(int score)

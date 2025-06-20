@@ -54,7 +54,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        GameManager.instance.ClickSlot(this);
+        GameManager.instance.CheckClientClickSlotServerRpc(this.rowSlot,this.colSlot,PlayerMultiplayerData.instance.playerTypeIs);
     }
 
     public void ResetSlot()

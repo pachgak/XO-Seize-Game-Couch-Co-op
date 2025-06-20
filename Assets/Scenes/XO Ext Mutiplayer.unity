@@ -13923,6 +13923,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d328eb01916e36479eaaef93062b71c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pointBase: 10
+  wonSlotCount: 3
+  playerX: {fileID: 0}
+  playerO: {fileID: 0}
+  row: []
+  playerTrun: 0
+  firstPlayer: {fileID: 0}
+  playerBaseTrun: {fileID: 0}
+  playerBaseNext: {fileID: 0}
+  isReadyClick: 0
+  isGameEnd: 0
+  slotTrigerWin: {fileID: 0}
 --- !u!4 &1502048122
 Transform:
   m_ObjectHideFlags: 0

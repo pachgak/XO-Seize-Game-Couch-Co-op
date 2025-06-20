@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using static UnityEditor.Experimental.GraphView.GraphView;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     public static GameManager instance;
     private void Awake()
@@ -25,13 +26,13 @@ public class GameManager : MonoBehaviour
     public static event Action<PlayerBase> OnEndGameEmptyPoint;
     public static event Action<Slot> OnSetSlot;
     public static event Action<List<Slot>> OnDagerSlot;
-    public static event Action<List<Slot>> OnResetDagerSlot;
-    public static event Action<Slot> OnWonTrigerSlot;
+    //public static event Action<List<Slot>> OnResetDagerSlot;
+    //public static event Action<Slot> OnWonTrigerSlot;
 
     //gameData
     public int pointBase = 10;
     public int wonSlotCount = 3;
-    public int wonTrunCount = 1;
+    //public int wonTrunCount = 1;
     public PlayerBase playerX;
     public PlayerBase playerO;
 
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
     public PlayerBase playerBaseNext;
     public bool isReadyClick;
     public bool isGameEnd;
+
     //click
     //public bool haveClick = false;
     //public Slot clickSlot;
@@ -96,8 +98,67 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    [Rpc(SendTo.Server)]
+    public void CheckClientClickSlotServerRpc()
+    {
+            Debug.Log($"Not Your Trun");
+ 
+    }
+
+    [Rpc(SendTo.Server)]
+    public void CheckClientClickSlotServerRpc(int slotClickRow, int slotClickCol, GameManager.PlayerType clickBy)
+    {
+        if (playerBaseTrun.typeIs != clickBy)
+        {
+            Debug.Log($"Not Your Trun");
+            return;
+        }
+        if (!isReadyClick) return;
+
+        ClickSlotRpc(slotClickRow, slotClickCol);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void ClickSlotRpc(int slotClickRow, int slotClickCol)
+    {
+        Slot slotClick = GameManager.instance.row[slotClickRow].col[slotClickCol];
+        //if (playerBaseTrun.typeIs != clickBy)
+        //{
+        //    Debug.Log($"Not Your Trun");
+        //    return;
+        //}
+        //if (!isReadyClick) return;
+
+        PlayerBase trunPlayer = playerBaseTrun;
+
+        if (slotClick.owner == null)
+        {
+            XOSetEmptySlot(slotClick);
+        }
+        else if (slotClick.owner != trunPlayer)
+        {
+            if (slotClick.isProtect)
+            {
+                XOProtection(slotClick);
+            }
+            else if (trunPlayer.point > slotClick.point)
+            {
+                XOGetEmemySlot(slotClick);
+            }
+            else
+            {
+                XONotEnoughPoint(slotClick);
+            }
+        }
+        else
+        {
+            Debug.Log($"this is your own yep");
+        }
+    }
+
     public void ClickSlot(Slot slotClick)
     {
+
         if (!isReadyClick) return;
 
         PlayerBase trunPlayer = playerBaseTrun;
